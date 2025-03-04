@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Payment Verification</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        #container { max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
+        input, button { width: 100%; margin: 10px 0; padding: 10px; }
+        img { width: 200px; }
+        #responseMessage { font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <h2>Scan & Pay</h2>
+        <p>Scan the QR Code below and complete the payment.</p>
+        <img src="https://yourgithubrepo.com/your-qr-code.png" alt="UPI QR Code">
+
+        <h3>Enter Payment Details</h3>
+        <form id="paymentForm">
+            <input type="text" id="upi_id" placeholder="Your UPI ID" required autocomplete="off">
+            <input type="text" id="transaction_id" placeholder="Transaction ID (as per UPI receipt)" required autocomplete="off">
+            <input type="file" id="screenshot" accept="image/png, image/jpeg" required>
+            <button type="submit">Submit Payment Details</button>
+        </form>
+
+        <p id="responseMessage"></p>
+    </div>
+
+    <script>
+        document.getElementById("paymentForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            let upiId = document.getElementById("upi_id").value.trim();
+            let transactionId = document.getElementById("transaction_id").value.trim();
+            let fileInput = document.getElementById("screenshot");
+            let file = fileInput.files[0];
+
+            if (!upiId || !transactionId || !file) {
+                alert("All fields are required.");
+                return;
+            }
+
+            let allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+            if (!allowedExtensions.exec(file.name)) {
+                alert("Only PNG and JPG files are allowed.");
+                fileInput.value = '';
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("upi_id", upiId);
+            formData.append("transaction_id", transactionId);
+            formData.append("screenshot", file);
+
+            fetch("https://script.google.com/macros/s/YOUR_GOOGLE_APPS_SCRIPT_URL/exec", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("responseMessage").innerText = "Payment details submitted successfully!";
+            })
+            .catch(error => {
+                document.getElementById("responseMessage").innerText = "Error submitting payment details.";
+            });
+        });
+    </script>
+
+</body>
+</html>
