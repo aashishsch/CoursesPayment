@@ -51,22 +51,29 @@
                 return;
             }
 
-            let formData = new FormData();
-            formData.append("upi_id", upiId);
-            formData.append("transaction_id", transactionId);
-            formData.append("screenshot", file);
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                let base64String = reader.result.replace("data:", "").replace(/^.+,/, "");
 
-            fetch("https://script.google.com/macros/s/AKfycbytv5D8ePniROIg4h-rp1-5U9omvQU_iMSvv35cFOiV3cR2Ay9o4ePoWVuOx2YJyBY/exec", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById("responseMessage").innerText = "Payment details submitted successfully!";
-            })
-            .catch(error => {
-                document.getElementById("responseMessage").innerText = "Error submitting payment details.";
-            });
+                let formData = new FormData();
+                formData.append("upi_id", upiId);
+                formData.append("transaction_id", transactionId);
+                formData.append("screenshot", base64String);
+                formData.append("mimetype", file.type);
+
+                fetch("https://script.google.com/macros/s/AKfycbytv5D8ePniROIg4h-rp1-5U9omvQU_iMSvv35cFOiV3cR2Ay9o4ePoWVuOx2YJyBY/exec", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("responseMessage").innerText = "Payment details submitted successfully!";
+                })
+                .catch(error => {
+                    document.getElementById("responseMessage").innerText = "Error submitting payment details.";
+                });
+            };
         });
     </script>
 
